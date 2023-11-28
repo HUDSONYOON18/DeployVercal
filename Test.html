@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Processing</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Table 1 -->
+<h2>Table 1</h2>
+<table id="table1">
+    <tr><th>Index</th><th>Value</th></tr>
+</table>
+
+<!-- Table 2 -->
+<h2>Table 2</h2>
+<table id="table2">
+    <tr><th>Category</th><th>Value</th></tr>
+    <tr><td>Alpha</td><td id="alphaValue"></td></tr>
+    <tr><td>Beta</td><td id="betaValue"></td></tr>
+    <tr><td>Charlie</td><td id="charlieValue"></td></tr>
+</table>
+
+<!-- Script -->
+<script>
+    // Fetch CSV data
+    fetch('Table_Input.csv')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(data => {
+            // Parse CSV data into array of objects
+            var dataArray = parseCSVData(data);
+
+            // Populate Table 1
+            var table1 = document.getElementById('table1');
+            populateTable(table1, dataArray);
+
+            // Display Table 2 using values from Table 1
+            displayTable2();
+        })
+        .catch(error => console.error('Error fetching the CSV file:', error));
+
+    // Function to parse CSV data
+    function parseCSVData(data) {
+        var lines = data.split('\n');
+        var headers = lines[0].split(',');
+        var dataArray = [];
+
+        for (var i = 1; i < lines.length; i++) {
+            var values = lines[i].split(',');
+            var entry = {};
+
+            for (var j = 0; j < headers.length; j++) {
+                entry[headers[j]] = values[j];
+            }
+
+            dataArray.push(entry);
+        }
+
+        return dataArray;
+    }
+
+    // Function to populate a table with data
+    function populateTable(table, dataArray) {
+        dataArray.forEach(entry => {
+            var row = table.insertRow(-1);
+            for (var key in entry) {
+                var cell = row.insertCell(-1);
+                cell.textContent = entry[key];
+            }
+        });
+    }
+
+    // Function to display Table 2 using values from Table 1
+    function displayTable2() {
+        // Get values from Table 1
+        var alphaValue = parseInt(document.getElementById('table1').rows[5].cells[1].textContent) +
+                         parseInt(document.getElementById('table1').rows[20].cells[1].textContent);
+
+        var betaValue = parseInt(document.getElementById('table1').rows[15].cells[1].textContent) /
+                        parseInt(document.getElementById('table1').rows[7].cells[1].textContent);
+
+        var charlieValue = parseInt(document.getElementById('table1').rows[13].cells[1].textContent) *
+                           parseInt(document.getElementById('table1').rows[12].cells[1].textContent);
+
+        console.log("Alpha Value:", alphaValue);
+        console.log("Beta Value:", betaValue);
+        console.log("Charlie Value:", charlieValue);
+
+        // Populate values in Table 2
+        document.getElementById('alphaValue').textContent = alphaValue;
+        document.getElementById('betaValue').textContent = betaValue;
+        document.getElementById('charlieValue').textContent = charlieValue;
+    }
+</script>
+
+</body>
+</html>
